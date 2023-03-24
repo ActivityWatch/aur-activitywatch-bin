@@ -15,5 +15,8 @@ update: .SRCINFO
 	git push
 	git push aur
 
+check:
+	namcap PKGBUILD
+
 clean:
 	rm -rf pkg src *.pkg.tar.*
