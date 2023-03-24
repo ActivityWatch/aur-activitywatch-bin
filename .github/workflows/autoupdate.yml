@@ -1,0 +1,74 @@
+name: Autoupdate
+
+# The main ActivityWatch repo sends a dispatch here on published stable releases
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  autoupdate:
+    name: "Update AUR package"
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+
+    - name: Install git
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S git --noconfirm
+
+    # Check out this repo
+    - uses: actions/checkout@v3
+      with:
+        path: 'activitywatch-bin'
+
+    # Check out activitywatch repo
+    - uses: actions/checkout@v3
+      with:
+        repository: ActivityWatch/activitywatch
+        path: 'activitywatch-src'
+        fetch-depth: 0
+
+    - name: Get latest version
+      run: |
+        pushd activitywatch-src
+        VERSION=$(STABLE_ONLY=true ./scripts/get_latest_release.sh | cut -c2-)
+        echo "Latest version is $VERSION"
+        popd
+        pushd activitywatch-bin
+        sed -E -i "s/^pkgver=.+\$/pkgver='$VERSION'/g" PKGBUILD
+
+    - name: Make SRCINFO and package
+      run: | 
+        useradd builduser -m  # Create the builduser
+        passwd -d builduser   # Delete the buildusers password
+
+        chmod -R a+rw activitywatch-bin
+        pushd activitywatch-bin
+        # needs to be run as a non-root user due to makepkg root-checks: https://www.reddit.com/r/archlinux/comments/6qu4jt/how_to_run_makepkg_in_docker_container_yes_as_root/
+        sudo -u builduser bash -c 'make package'
+        popd
+
+    - name: Check SRCINFO
+      uses: 2m/arch-pkgbuild-builder@v1.16
+      with:
+        target: 'srcinfo'
+        pkgname: 'activitywatch-bin'
+
+    #- name: Build PKGBUILD
+    #  uses: 2m/arch-pkgbuild-builder@v1.16
+    #  with:
+    #    target: 'pkgbuild'
+    #    pkgname: 'activitywatch-bin'
+
+    - name: Check that basic commands run
+      uses: 2m/arch-pkgbuild-builder@v1.16
+      with:
+        target: 'run'
+        pkgname: 'activitywatch-bin'
+        command: 'aw-qt --help && aw-server-rust --version'  # && aw-server --version
