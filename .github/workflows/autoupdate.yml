@@ -17,10 +17,10 @@ jobs:
 
     steps:
 
-    - name: Install git
+    - name: Install dependencies with pacman
       run: |
         pacman -Syu --noconfirm
-        pacman -S git --noconfirm
+        pacman -S git namcap --noconfirm
 
     # Check out this repo
     - uses: actions/checkout@v3
@@ -43,12 +43,20 @@ jobs:
         pushd activitywatch-bin
         sed -E -i "s/^pkgver=.+\$/pkgver='$VERSION'/g" PKGBUILD
 
-    - name: Make SRCINFO and package
-      run: | 
+    - name: Run namcap
+      run: |
+        pushd activitywatch-bin
+        make check
+        popd
+
+    - name: Set up user
+      run: |
         useradd builduser -m  # Create the builduser
         passwd -d builduser   # Delete the buildusers password
-
         chmod -R a+rw activitywatch-bin
+
+    - name: Make SRCINFO and package
+      run: | 
         pushd activitywatch-bin
         # needs to be run as a non-root user due to makepkg root-checks: https://www.reddit.com/r/archlinux/comments/6qu4jt/how_to_run_makepkg_in_docker_container_yes_as_root/
         sudo -u builduser bash -c 'make package'

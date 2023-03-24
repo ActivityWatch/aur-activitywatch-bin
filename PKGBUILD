@@ -19,7 +19,7 @@ depends=(
     #'gtk3'
     #'openssl-1.0'
 )
-source=("https://github.com/ActivityWatch/activitywatch/releases/download/v${pkgver}/activitywatch-v${pkgver}-linux-x86_64.zip")
+source=("https://github.com/ActivityWatch/activitywatch/releases/download/v${pkgver}/activitywatch-v${pkgver}-linux-$CARCH.zip")
 md5sums=('SKIP')
 
 package() {
