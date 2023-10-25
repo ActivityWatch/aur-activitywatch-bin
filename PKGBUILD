@@ -14,21 +14,83 @@ license=('MPL2')
 provides=("activitywatch")
 conflicts=("activitywatch")
 depends=(
-    #'qt5-base'
-    #'qt5-svg'
+    #'qt6-base'
+    #'qt6-svg'
     #'gtk3'
     #'openssl-1.0'
+freetype2
+libgcrypt
+at-spi2-core
+glibc
+fontconfig
+libxdamage
+libbsd
+pcre2
+pango
+libxrender
+xcb-util
+libxfixes
+qt6-base
+harfbuzz
+libxinerama
+libglvnd
+xz
+qt6-webengine
+libxcursor
+glib2
+libdatrie
+wayland
+gcc-libs
+pixman
+libx11
+bash
+zlib
+lz4
+systemd-libs
+libxi
+bzip2
+cairo
+libxcomposite
+openssl-1.1
+sqlite
+xcb-util-cursor
+keyutils
+libepoxy
+util-linux-libs
+qt6-svg
+readline
+dbus
+libgpg-error
+libxcb
+gdk-pixbuf2
+libxkbcommon
+krb5
+libxkbcommon-x11
+qt6-wayland
+libxrandr
+gtk3
+xcb-util-image
+xcb-util-renderutil
+xcb-util-wm
+libxext
+e2fsprogs
+libpng
+libdrm
+xcb-util-keysyms
+fribidi
+libthai
+
 )
 source=("https://github.com/ActivityWatch/activitywatch/releases/download/v${pkgver}/activitywatch-v${pkgver}-linux-x86_64.zip")
 md5sums=('74f605bf34f9f352261ca9a53cc32082')
 
 package() {
     # Install into /opt/activitywatch
-    mkdir -p $pkgdir/opt
+    install -d $pkgdir/opt
     cp -r activitywatch $pkgdir/opt
 
     # Symlink executables to /usr/bin
-    mkdir -p $pkgdir/usr/bin
+    install -d $pkgdir/usr/bin
     execnames=("aw-qt")
     for name in "${execnames[@]}"; do
         ln -s /opt/activitywatch/$name $pkgdir/usr/bin/$name
@@ -40,8 +102,7 @@ package() {
     done
 
     # Add .desktop file for autostart
-    mkdir -p $pkgdir/etc/xdg/autostart
-    cp activitywatch/aw-qt.desktop $pkgdir/etc/xdg/autostart
+    install -Dm644 activitywatch/aw-qt.desktop -t $pkgdir/etc/xdg/autostart
 
     # See: https://aur.archlinux.org/packages/activitywatch-bin/#comment-834170
     #rm $pkgdir/opt/activitywatch/libharfbuzz.so*
