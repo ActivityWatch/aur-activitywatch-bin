@@ -4,7 +4,7 @@
 # PRs welcome at: https://github.com/ActivityWatch/aur-activitywatch-bin
 
 pkgname=activitywatch-bin
-pkgver='0.13.1'
+pkgver='0.13.2'
 pkgrel=1
 epoch=
 pkgdesc="Track how you spend time on your computer. Simple, extensible, no third parties."
@@ -20,7 +20,7 @@ depends=(
     #'openssl-1.0'
 )
 source=("https://github.com/ActivityWatch/activitywatch/releases/download/v${pkgver}/activitywatch-v${pkgver}-linux-x86_64.zip")
-md5sums=('31561b479c36cef84eee77b9f89853b9')
+md5sums=('663501b3a59a874d549142d78c77f6d3')
 
 package() {
     # Install into /opt/activitywatch
@@ -36,7 +36,7 @@ package() {
 
     modulenames=("aw-server" "aw-server-rust" "aw-watcher-afk" "aw-watcher-window" "aw-watcher-input" "aw-notify" "aw-server-rust/aw-sync")
     for name in "${modulenames[@]}"; do
-        # if a module has a path, use that, 
+        # if a module has a path, use that,
         # else assume its in a dir with the same name as the module
         dir=$(dirname $name)
         if [ "$dir" == "." ]; then
